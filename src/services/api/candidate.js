@@ -37,7 +37,12 @@ export const createCandidate = async (candidateData) => {
   try {
     const response = await axios.post(
       `${API_URL}/api/candidates`,
-      candidateData
+      candidateData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
     );
     return response.data;
   } catch (error) {

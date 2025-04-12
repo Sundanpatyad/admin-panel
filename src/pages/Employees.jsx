@@ -105,7 +105,7 @@ const Employees = () => {
 
     return (
       <div className="bg-white h-[70vh] rounded-xl sm:rounded-3xl shadow overflow-hidden">
-        <div className="overflow-x-auto">
+        <div className="">
           <table className="w-full min-w-[800px]">
             <thead className="bg-purple-700 text-white">
               <tr>

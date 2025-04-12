@@ -6,10 +6,10 @@ import {
 } from "../redux/slices/candidateSlice";
 import { useDispatch, useSelector } from "react-redux";
 
-import Dropdown from "../components/Dropdown"; // Changed from StatusDropdown to Dropdown
+import Dropdown from "../components/Dropdown";
 import Header from "../components/Header";
 import MainLayout from "../layouts/MainLayout";
-import SkeletonLoader from "../components/SkeletonLoader"; // Add this import
+import SkeletonLoader from "../components/SkeletonLoader";
 
 function Dashboard() {
   const dispatch = useDispatch();
@@ -27,7 +27,6 @@ function Dashboard() {
     position: "",
   });
 
-  // Status options for the dropdown
   const statusOptions = [
     { value: "New", label: "New" },
     { value: "Scheduled", label: "Scheduled" },
@@ -36,7 +35,6 @@ function Dashboard() {
     { value: "Rejected", label: "Rejected" },
   ];
 
-  // Status style function
   const getStatusStyle = (status) => {
     switch (status) {
       case "New":
@@ -139,7 +137,6 @@ function Dashboard() {
     return (
       <div className="bg-white h-auto sm:h-[70vh] rounded-lg overflow-hidden sm:rounded-3xl shadow">
         <div>
-          {/* Desktop View */}
           <table className="w-full min-w-[800px]">
             <thead className="bg-purple-700  text-white">
               <tr>
@@ -263,7 +260,6 @@ function Dashboard() {
     );
   };
 
-  // Only updating the StatusDropdown usage in the table
   return (
     <MainLayout title={"Candidates"}>
       <div className="p-3 sm:p-4 md:p-6">

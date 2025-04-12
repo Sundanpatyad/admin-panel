@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 
 import AddCandidateModal from "./AddCandidateModal";
+import Dropdown from "./Dropdown"; // Add this import
 import { addCandidate } from "../redux/slices/candidateSlice";
 import { useDispatch } from "react-redux";
 
@@ -10,6 +11,22 @@ const Header = ({ title, onAddClick, onFilterChange }) => {
   const [statusFilter, setStatusFilter] = useState("");
   const [positionFilter, setPositionFilter] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Status options for dropdown
+  const statusOptions = [
+    { value: "", label: "Status" },
+    { value: "New", label: "New" },
+    { value: "Selected", label: "Selected" },
+    { value: "Rejected", label: "Rejected" },
+  ];
+
+  // Position options for dropdown
+  const positionOptions = [
+    { value: "", label: "Position" },
+    { value: "Developer", label: "Developer" },
+    { value: "Designer", label: "Designer" },
+    { value: "HR", label: "HR" },
+  ];
 
   // Update filters and notify parent
   const handleSearchChange = (e) => {
@@ -22,8 +39,7 @@ const Header = ({ title, onAddClick, onFilterChange }) => {
     });
   };
 
-  const handleStatusFilterChange = (e) => {
-    const value = e.target.value;
+  const handleStatusFilterChange = (value) => {
     setStatusFilter(value);
     onFilterChange?.({
       search: searchTerm,
@@ -32,8 +48,7 @@ const Header = ({ title, onAddClick, onFilterChange }) => {
     });
   };
 
-  const handlePositionFilterChange = (e) => {
-    const value = e.target.value;
+  const handlePositionFilterChange = (value) => {
     setPositionFilter(value);
     onFilterChange?.({
       search: searchTerm,
@@ -63,26 +78,18 @@ const Header = ({ title, onAddClick, onFilterChange }) => {
       <div className="flex justify-between items-center mb-6">
         <div className="flex items-center w-full justify-between gap-4">
           <div className="flex gap-4">
-            <select
-              className="px-4 py-2 border border-gray-300 rounded-full min-w-[120px]"
+            <Dropdown
               value={statusFilter}
               onChange={handleStatusFilterChange}
-            >
-              <option value="">Status</option>
-              <option value="New">New</option>
-              <option value="Selected">Selected</option>
-              <option value="Rejected">Rejected</option>
-            </select>
-            <select
-              className="px-4 py-2 border border-gray-300 rounded-full min-w-[120px]"
+              options={statusOptions}
+              className="min-w-[120px]"
+            />
+            <Dropdown
               value={positionFilter}
               onChange={handlePositionFilterChange}
-            >
-              <option value="">Position</option>
-              <option value="Developer">Developer</option>
-              <option value="Designer">Designer</option>
-              <option value="HR">HR</option>
-            </select>
+              options={positionOptions}
+              className="min-w-[120px]"
+            />
           </div>
           <div className="flex items-center gap-4">
             <div className="relative">

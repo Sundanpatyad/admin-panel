@@ -30,22 +30,17 @@ function Signup() {
 
   const password = watch("password");
 
-  // Form submission handler
   const onSubmit = async (data) => {
     try {
-      // Remove confirmPassword as it's not needed for the API
       const { ...userData } = data;
 
-      // Dispatch register action from Redux
       const result = await dispatch(registerAction(userData)).unwrap();
 
       if (result) {
-        // Navigate to login page on successful registration
         navigate("/login");
       }
     } catch (err) {
       console.error("Registration failed:", err);
-      // Error is handled by Redux and displayed in the UI
     }
   };
 

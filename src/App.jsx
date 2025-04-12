@@ -9,7 +9,6 @@ import {
 import Dashboard from "./pages/Dashboard";
 import EmployeeAttendance from "./pages/EmployeeAttendance";
 import Employees from "./pages/Employees";
-import Home from "./pages/Home";
 import Layout from "./components/Layout";
 import Leave from "./pages/Leave";
 import Login from "./pages/Login";

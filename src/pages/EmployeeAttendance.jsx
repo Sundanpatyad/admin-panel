@@ -8,7 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Dropdown from "../components/Dropdown";
 import MainLayout from "../layouts/MainLayout";
 import PageHeader from "../components/PageHeader";
-import SkeletonLoader from "../components/SkeletonLoader"; // Add this import
+import SkeletonLoader from "../components/SkeletonLoader";
 
 const EmployeeAttendance = () => {
   const dispatch = useDispatch();
@@ -27,14 +27,11 @@ const EmployeeAttendance = () => {
       updateAttendance({
         employeeId,
         status: newStatus,
-        task: "--", // You can add a task input field if needed
+        task: "--",
       })
     );
   };
 
-  // Remove console.log
-
-  // Filter employees based on search and status
   const filteredEmployees = attendance?.filter((employee) => {
     const matchesSearch =
       employee.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -55,7 +52,6 @@ const EmployeeAttendance = () => {
     );
   }
 
-  // Add a renderContent function to handle different states
   const renderContent = () => {
     if (status === "loading" && (!attendance || attendance.length === 0)) {
       return <SkeletonLoader rows={7} columns={7} hasProfile={true} />;
@@ -119,6 +115,7 @@ const EmployeeAttendance = () => {
                       handleStatusChange(employee._id, newStatus)
                     }
                     options={attendanceStatusOptions}
+                    getStatusStyle={getStatusStyle}
                     disabled={status === "loading"}
                     className="w-40"
                   />

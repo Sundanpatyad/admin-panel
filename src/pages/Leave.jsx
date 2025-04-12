@@ -178,14 +178,12 @@ const LeaveCalendar = ({
     y: 0,
   });
 
-  // Function to get leaves for a specific date
   const getLeavesForDate = (date) => {
     return approvedLeaves.filter(
       (leave) => new Date(leave.date).toDateString() === date.toDateString()
     );
   };
 
-  // Handle mouse enter on date with leave
   const handleMouseEnter = (e, date) => {
     const leavesOnDate = getLeavesForDate(date);
     if (leavesOnDate.length > 0) {
@@ -199,7 +197,6 @@ const LeaveCalendar = ({
     }
   };
 
-  // Handle mouse leave
   const handleMouseLeave = () => {
     setTooltip({ visible: false, content: null, x: 0, y: 0 });
   };
@@ -307,7 +304,6 @@ const LeaveCalendar = ({
           })}
         </div>
 
-        {/* Tooltip */}
         {tooltip.visible && tooltip.content && (
           <div
             className="absolute z-10 bg-white rounded-lg shadow-lg border border-gray-200 p-2 max-w-xs"
@@ -429,7 +425,6 @@ const Leave = () => {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      // Handle filter dropdown
       if (isStatusDropdownOpen && !event.target.closest(".filter-dropdown")) {
         setIsStatusDropdownOpen(false);
       }

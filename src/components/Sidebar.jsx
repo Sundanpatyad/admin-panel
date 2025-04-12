@@ -10,8 +10,51 @@ function Sidebar() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
-  // const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const { isOpen: isSidebarOpen } = useSelector((state) => state.nav);
+
+  // Navigation items for search - adding keywords for better matching
+  const navigationItems = [
+    {
+      path: "/candidates",
+      label: "Candidates",
+      section: "Recruitment",
+      keywords: ["candidate", "applicant", "job", "recruit", "hiring"],
+    },
+    {
+      path: "/employees",
+      label: "Employees",
+      section: "Organization",
+      keywords: ["employee", "staff", "team", "member", "worker", "personnel"],
+    },
+    {
+      path: "/attendance",
+      label: "Attendance",
+      section: "Organization",
+      keywords: [
+        "attendance",
+        "present",
+        "absent",
+        "time",
+        "clock",
+        "check-in",
+      ],
+    },
+    {
+      path: "/leaves",
+      label: "Leaves",
+      section: "Organization",
+      keywords: [
+        "leave",
+        "vacation",
+        "holiday",
+        "time-off",
+        "absence",
+        "day-off",
+      ],
+    },
+  ];
+
   // Close sidebar when clicking outside on mobile
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -43,10 +86,85 @@ function Sidebar() {
     setIsLogoutModalOpen(false);
   };
 
+  // Handle search input change
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  // Enhanced search submission with better matching and feedback
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+
+    if (!searchQuery.trim()) return;
+
+    // Find matching navigation item with improved matching
+    const searchLower = searchQuery.toLowerCase();
+    const matchedItem = navigationItems.find(
+      (item) =>
+        item.label.toLowerCase().includes(searchLower) ||
+        item.section.toLowerCase().includes(searchLower) ||
+        item.keywords.some((keyword) => keyword.includes(searchLower))
+    );
+
+    if (matchedItem) {
+      navigate(matchedItem.path);
+      setSearchQuery("");
+      if (window.innerWidth < 768) {
+        dispatch(closeSidebar());
+      }
+    } else {
+      // Provide visual feedback when no match is found
+      setSearchQuery("");
+      // Optional: Add a toast notification or other feedback here
+    }
+  };
+
+  // Add real-time search suggestions
+  const [searchResults, setSearchResults] = useState([]);
+  const [showResults, setShowResults] = useState(false);
+
+  // Update search results as user types
+  useEffect(() => {
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      const results = navigationItems.filter(
+        (item) =>
+          item.label.toLowerCase().includes(query) ||
+          item.section.toLowerCase().includes(query) ||
+          item.keywords.some((keyword) => keyword.includes(query))
+      );
+      setSearchResults(results);
+      setShowResults(true);
+    } else {
+      setSearchResults([]);
+      setShowResults(false);
+    }
+  }, [searchQuery]);
+
+  // Handle clicking outside to close search results
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest(".search-container")) {
+        setShowResults(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Handle search result selection
+  const handleResultClick = (path) => {
+    navigate(path);
+    setSearchQuery("");
+    setShowResults(false);
+    if (window.innerWidth < 768) {
+      dispatch(closeSidebar());
+    }
+  };
+
   return (
     <>
-      {/* Sidebar Toggle Button */}
-
       {/* Overlay for mobile */}
       {isSidebarOpen && (
         <div className="fixed inset-0 bg-black/50 z-40 md:hidden" />
@@ -64,9 +182,9 @@ function Sidebar() {
           <span className="ml-2 text-xl font-bold text-purple-700">LOGO</span>
         </div>
 
-        {/* Search */}
-        <div className="mb-8">
-          <div className="relative">
+        {/* Enhanced Search with dropdown results */}
+        <div className="mb-8 search-container relative">
+          <form onSubmit={handleSearchSubmit} className="relative">
             <span className="absolute inset-y-0 left-0 flex items-center pl-3">
               <svg
                 className="w-5 h-5 text-gray-400"
@@ -85,12 +203,31 @@ function Sidebar() {
             <input
               type="text"
               placeholder="Search"
+              value={searchQuery}
+              onChange={handleSearchChange}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-1 focus:ring-purple-500"
+              onFocus={() => searchResults.length > 0 && setShowResults(true)}
             />
-          </div>
+          </form>
+
+          {/* Search Results Dropdown */}
+          {showResults && searchResults.length > 0 && (
+            <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto">
+              {searchResults.map((item) => (
+                <div
+                  key={item.path}
+                  className="px-4 py-2 hover:bg-purple-50 cursor-pointer"
+                  onClick={() => handleResultClick(item.path)}
+                >
+                  <div className="font-medium text-gray-900">{item.label}</div>
+                  <div className="text-sm text-gray-500">{item.section}</div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
-        {/* Navigation Sections */}
+        {/* Rest of the sidebar remains unchanged */}
         <div className="space-y-8">
           {/* Recruitment Section */}
           <div>

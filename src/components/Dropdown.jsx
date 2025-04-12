@@ -64,7 +64,7 @@ const Dropdown = ({
                 key={option.value}
                 className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${
                   value === option.value ? "bg-gray-50" : ""
-                } ${getOptionStyle ? getOptionStyle(option.value) : ""}`}
+                }`}
                 onClick={() => {
                   onChange(option.value);
                   setIsOpen(false);

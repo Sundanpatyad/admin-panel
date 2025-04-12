@@ -17,6 +17,20 @@ const statusOptions = [
   { value: "Rejected", label: "Rejected" },
 ];
 
+// Add status style function
+const getStatusStyle = (status) => {
+  switch (status) {
+    case "Approved":
+      return "bg-green-100 text-green-800";
+    case "Pending":
+      return "bg-yellow-100 text-yellow-800";
+    case "Rejected":
+      return "bg-red-100 text-red-800";
+    default:
+      return "bg-gray-100 text-gray-800";
+  }
+};
+
 const LeaveTable = ({ filteredLeaves, handleUpdateStatus }) => {
   const handleDocumentDownload = (documentUrl, fileName = "document") => {
     if (!documentUrl) return;
@@ -95,13 +109,14 @@ const LeaveTable = ({ filteredLeaves, handleUpdateStatus }) => {
 
                 {/* Status */}
                 <td className="px-4 py-4">
-                  <div className="relative z-[60]">
+                  <div className="relative ">
                     <Dropdown
                       value={leave.status}
                       onChange={(newStatus) =>
                         handleUpdateStatus(leave._id, newStatus)
                       }
                       options={statusOptions}
+                      getOptionStyle={getStatusStyle}
                       className="w-32"
                     />
                   </div>
@@ -155,6 +170,37 @@ const LeaveCalendar = ({
   setSelectedDate,
   approvedLeaves,
 }) => {
+  // Add state for tooltip
+  const [tooltip, setTooltip] = useState({
+    visible: false,
+    content: null,
+    x: 0,
+    y: 0,
+  });
+
+  const getLeavesForDate = (date) => {
+    return approvedLeaves.filter(
+      (leave) => new Date(leave.date).toDateString() === date.toDateString()
+    );
+  };
+
+  const handleMouseEnter = (e, date) => {
+    const leavesOnDate = getLeavesForDate(date);
+    if (leavesOnDate.length > 0) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      setTooltip({
+        visible: true,
+        content: leavesOnDate,
+        x: rect.left + window.scrollX,
+        y: rect.bottom + window.scrollY,
+      });
+    }
+  };
+
+  const handleMouseLeave = () => {
+    setTooltip({ visible: false, content: null, x: 0, y: 0 });
+  };
+
   return (
     <div className="bg-white rounded-3xl overflow-hidden shadow-sm">
       <div className="bg-purple-700 text-white px-6 py-4">
@@ -234,6 +280,8 @@ const LeaveCalendar = ({
               <button
                 key={day}
                 onClick={() => setSelectedDate(date)}
+                onMouseEnter={(e) => hasLeave && handleMouseEnter(e, date)}
+                onMouseLeave={handleMouseLeave}
                 className={`h-12 border flex items-center justify-center rounded-lg text-sm relative transition-colors duration-200 ${
                   isSelected
                     ? "bg-purple-100 text-purple-700 font-semibold"
@@ -255,6 +303,41 @@ const LeaveCalendar = ({
             );
           })}
         </div>
+
+        {tooltip.visible && tooltip.content && (
+          <div
+            className="absolute z-10 bg-white rounded-lg shadow-lg border border-gray-200 p-2 max-w-xs"
+            style={{
+              left: `${tooltip.x}px`,
+              top: `${tooltip.y}px`,
+              transform: "translateX(-50%)",
+            }}
+          >
+            <div className="text-sm font-medium text-gray-900 mb-1">
+              {new Date(tooltip.content[0].date).toLocaleDateString()}
+            </div>
+            <div className="space-y-2">
+              {tooltip.content.map((leave) => (
+                <div key={leave._id} className="flex items-center space-x-2">
+                  <div className="w-6 h-6 rounded-full bg-gray-200 overflow-hidden">
+                    <img
+                      src={
+                        leave.profile ||
+                        `https://ui-avatars.com/api/?name=${leave.name}&background=random`
+                      }
+                      alt={leave.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div>
+                    <div className="text-xs font-medium">{leave.name}</div>
+                    <div className="text-xs text-gray-500">{leave.reason}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="mt-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
@@ -342,7 +425,6 @@ const Leave = () => {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      // Handle filter dropdown
       if (isStatusDropdownOpen && !event.target.closest(".filter-dropdown")) {
         setIsStatusDropdownOpen(false);
       }

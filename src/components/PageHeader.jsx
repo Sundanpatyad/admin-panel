@@ -1,3 +1,4 @@
+import Dropdown from "./Dropdown"; // Add this import
 import React from "react";
 
 const PageHeader = ({
@@ -6,22 +7,28 @@ const PageHeader = ({
   onSearchChange,
   positionFilter,
   onPositionChange,
+  statusFilter,
+  onStatusChange,
 }) => {
+  // Position options for dropdown
+  const positionOptions = [
+    { value: "", label: "Position" },
+    { value: "Full Time", label: "Full Time" },
+    { value: "Senior", label: "Senior" },
+    { value: "Junior", label: "Junior" },
+    { value: "Team Lead", label: "Team Lead" },
+    { value: "Intern", label: "Intern" },
+  ];
+
   return (
     <div className="flex justify-between items-center mb-6">
       <div className="flex items-center justify-between w-full gap-4">
-        <select
-          className="px-4 py-2 border border-gray-300 rounded-full min-w-[150px]"
+        <Dropdown
           value={positionFilter}
           onChange={onPositionChange}
-        >
-          <option value="">Position</option>
-          <option value="Full Time">Full Time</option>
-          <option value="Senior">Senior</option>
-          <option value="Junior">Junior</option>
-          <option value="Team Lead">Team Lead</option>
-          <option value="Intern">Intern</option>
-        </select>
+          options={positionOptions}
+          className="min-w-[150px]"
+        />
         <div className="relative">
           <input
             type="text"

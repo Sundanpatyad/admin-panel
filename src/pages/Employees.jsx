@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import EditEmployeeModal from "../components/EditEmployeeModal";
 import MainLayout from "../layouts/MainLayout";
 import PageHeader from "../components/PageHeader";
+import SkeletonLoader from "../components/SkeletonLoader"; // Add this import
 
 const Employees = () => {
   const dispatch = useDispatch();
@@ -87,12 +88,8 @@ const Employees = () => {
   });
 
   const renderContent = () => {
-    if (status === "loading") {
-      return (
-        <div className="p-4 sm:p-6 flex justify-center items-center h-64">
-          <div className="text-lg sm:text-xl text-gray-600">Loading...</div>
-        </div>
-      );
+    if (status === "loading" && (!employees || employees.length === 0)) {
+      return <SkeletonLoader rows={7} columns={8} hasProfile={true} />;
     }
 
     if (error) {

@@ -6,9 +6,10 @@ import {
 } from "../redux/slices/candidateSlice";
 import { useDispatch, useSelector } from "react-redux";
 
+import Dropdown from "../components/Dropdown"; // Changed from StatusDropdown to Dropdown
 import Header from "../components/Header";
 import MainLayout from "../layouts/MainLayout";
-import StatusDropdown from "../components/StatusDropdown";
+import SkeletonLoader from "../components/SkeletonLoader"; // Add this import
 
 function Dashboard() {
   const dispatch = useDispatch();
@@ -25,6 +26,33 @@ function Dashboard() {
     status: "",
     position: "",
   });
+
+  // Status options for the dropdown
+  const statusOptions = [
+    { value: "New", label: "New" },
+    { value: "Scheduled", label: "Scheduled" },
+    { value: "Ongoing", label: "Ongoing" },
+    { value: "Selected", label: "Selected" },
+    { value: "Rejected", label: "Rejected" },
+  ];
+
+  // Status style function
+  const getStatusStyle = (status) => {
+    switch (status) {
+      case "New":
+        return "bg-white text-black border border-gray-300";
+      case "Selected":
+        return "bg-purple-100 text-purple-800";
+      case "Rejected":
+        return "bg-red-100 text-red-800";
+      case "Scheduled":
+        return "bg-blue-100 text-blue-800";
+      case "Ongoing":
+        return "bg-yellow-100 text-yellow-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
 
   useEffect(() => {
     dispatch(fetchCandidates());
@@ -95,13 +123,7 @@ function Dashboard() {
 
   const renderContent = () => {
     if (status === "loading" && candidates.length === 0) {
-      return (
-        <div className="p-4 flex justify-center items-center h-64">
-          <div className="text-base sm:text-lg text-gray-600">
-            Loading candidates...
-          </div>
-        </div>
-      );
+      return <SkeletonLoader rows={7} />; // Show skeleton loader with 7 rows
     }
 
     if (status === "failed" && candidates.length === 0) {
@@ -166,11 +188,14 @@ function Dashboard() {
                     {candidate?.position}
                   </td>
                   <td className="px-3 sm:px-6 py-2 sm:py-4 text-xs sm:text-sm">
-                    <StatusDropdown
+                    <Dropdown
                       value={candidate?.status}
                       onChange={(newStatus) =>
                         handleStatusChange(candidate._id, newStatus)
                       }
+                      options={statusOptions}
+                      getOptionStyle={getStatusStyle}
+                      className="w-[132px]"
                     />
                   </td>
                   <td className="px-3 sm:px-6 py-2 sm:py-4 text-xs sm:text-sm whitespace-nowrap">
@@ -238,6 +263,7 @@ function Dashboard() {
     );
   };
 
+  // Only updating the StatusDropdown usage in the table
   return (
     <MainLayout title={"Candidates"}>
       <div className="p-3 sm:p-4 md:p-6">

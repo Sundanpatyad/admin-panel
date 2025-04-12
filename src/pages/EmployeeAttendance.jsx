@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Dropdown from "../components/Dropdown";
 import MainLayout from "../layouts/MainLayout";
 import PageHeader from "../components/PageHeader";
+import SkeletonLoader from "../components/SkeletonLoader"; // Add this import
 
 const EmployeeAttendance = () => {
   const dispatch = useDispatch();
@@ -54,6 +55,93 @@ const EmployeeAttendance = () => {
     );
   }
 
+  // Add a renderContent function to handle different states
+  const renderContent = () => {
+    if (status === "loading" && (!attendance || attendance.length === 0)) {
+      return <SkeletonLoader rows={7} columns={7} hasProfile={true} />;
+    }
+
+    return (
+      <div className="bg-white rounded-3xl h-[70vh] shadow overflow-hidden">
+        <table className="w-full">
+          <thead className="bg-purple-700 text-white">
+            <tr>
+              <th className="px-6 py-3 text-left text-sm font-medium">
+                Profile
+              </th>
+              <th className="px-6 py-3 text-left text-sm font-medium">
+                Employee Name
+              </th>
+              <th className="px-6 py-3 text-left text-sm font-medium">
+                Position
+              </th>
+              <th className="px-6 py-3 text-left text-sm font-medium">
+                Department
+              </th>
+              <th className="px-6 py-3 text-left text-sm font-medium">Task</th>
+              <th className="px-6 py-3 text-left text-sm font-medium">
+                Status
+              </th>
+              <th className="px-6 py-3 text-left text-sm font-medium">
+                Action
+              </th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {filteredEmployees?.map((employee) => (
+              <tr key={employee._id} className="hover:bg-gray-50">
+                <td className="px-6 py-4">
+                  {employee.profileImage ? (
+                    <img
+                      src={employee.profileImage}
+                      alt={employee.fullName}
+                      className="w-10 h-10 rounded-full"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-purple-700 flex items-center justify-center text-white">
+                      {employee.fullName
+                        .split(" ")
+                        .map((name) => name[0])
+                        .join("")
+                        .toUpperCase()
+                        .slice(0, 2)}
+                    </div>
+                  )}
+                </td>
+                <td className="px-6 py-4 text-sm">{employee.fullName}</td>
+                <td className="px-6 py-4 text-sm">{employee.position}</td>
+                <td className="px-6 py-4 text-sm">{employee.department}</td>
+                <td className="px-6 py-4 text-sm">{employee.task || "--"}</td>
+                <td className="px-6 py-4 text-sm">
+                  <Dropdown
+                    value={employee.status || "Absent"}
+                    onChange={(newStatus) =>
+                      handleStatusChange(employee._id, newStatus)
+                    }
+                    options={attendanceStatusOptions}
+                    disabled={status === "loading"}
+                    className="w-40"
+                  />
+                </td>
+                <td className="px-6 py-4 text-sm relative">
+                  <button className="text-gray-400 hover:text-gray-600">
+                    <svg
+                      className="w-5 h-5"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                    </svg>
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
+
   return (
     <MainLayout title={"Attandance"}>
       <div className="p-6">
@@ -65,85 +153,7 @@ const EmployeeAttendance = () => {
           onStatusChange={(e) => setSelectedStatus(e.target.value)}
         />
 
-        <div className="bg-white rounded-3xl h-[70vh] shadow overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-purple-700 text-white">
-              <tr>
-                <th className="px-6 py-3 text-left text-sm font-medium">
-                  Profile
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-medium">
-                  Employee Name
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-medium">
-                  Position
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-medium">
-                  Department
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-medium">
-                  Task
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-medium">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-sm font-medium">
-                  Action
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {filteredEmployees?.map((employee) => (
-                <tr key={employee._id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4">
-                    {employee.profileImage ? (
-                      <img
-                        src={employee.profileImage}
-                        alt={employee.fullName}
-                        className="w-10 h-10 rounded-full"
-                      />
-                    ) : (
-                      <div className="w-10 h-10 rounded-full bg-purple-700 flex items-center justify-center text-white">
-                        {employee.fullName
-                          .split(" ")
-                          .map((name) => name[0])
-                          .join("")
-                          .toUpperCase()
-                          .slice(0, 2)}
-                      </div>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 text-sm">{employee.fullName}</td>
-                  <td className="px-6 py-4 text-sm">{employee.position}</td>
-                  <td className="px-6 py-4 text-sm">{employee.department}</td>
-                  <td className="px-6 py-4 text-sm">{employee.task || "--"}</td>
-                  <td className="px-6 py-4 text-sm">
-                    <Dropdown
-                      value={employee.status || "Absent"}
-                      onChange={(newStatus) =>
-                        handleStatusChange(employee._id, newStatus)
-                      }
-                      options={attendanceStatusOptions}
-                      disabled={status === "loading"}
-                      className="w-40"
-                    />
-                  </td>
-                  <td className="px-6 py-4 text-sm relative">
-                    <button className="text-gray-400 hover:text-gray-600">
-                      <svg
-                        className="w-5 h-5"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                      </svg>
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        {renderContent()}
       </div>
     </MainLayout>
   );

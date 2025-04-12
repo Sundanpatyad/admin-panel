@@ -1,7 +1,21 @@
-import React from "react";
+import Dropdown from "./Dropdown"; // Add this import
 import Modal from "./Modal";
+import React from "react";
 
 const EditEmployeeModal = ({ isOpen, onClose, employee, onSave, onChange }) => {
+  // Position options for dropdown
+  const positionOptions = [
+    { value: "Full Time", label: "Full Time" },
+    { value: "Intern", label: "Intern" },
+    { value: "Contractor", label: "Contractor" },
+    { value: "Manager", label: "Manager" },
+  ];
+
+  // Handle dropdown change
+  const handlePositionChange = (value) => {
+    onChange({ target: { name: "position", value } });
+  };
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} title="Edit Employee Details">
       <div className="grid grid-cols-2 gap-6">
@@ -16,6 +30,8 @@ const EditEmployeeModal = ({ isOpen, onClose, employee, onSave, onChange }) => {
             required
           />
         </div>
+
+        {/* Other input fields remain unchanged */}
         <div>
           <input
             type="email"
@@ -49,21 +65,18 @@ const EditEmployeeModal = ({ isOpen, onClose, employee, onSave, onChange }) => {
             required
           />
         </div>
+
+        {/* Replace select with Dropdown component */}
         <div>
-          <select
-            name="position"
+          <Dropdown
             value={employee.position}
-            onChange={onChange}
-            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-purple-500"
-            required
-          >
-            <option value="">Select Position*</option>
-            <option value="Full Time">Full Time</option>
-            <option value="Intern">Intern</option>
-            <option value="Contractor">Contractor</option>
-            <option value="Manager">Manager</option>
-          </select>
+            onChange={handlePositionChange}
+            options={positionOptions}
+            placeholder="Select Position*"
+            className="rounded-md"
+          />
         </div>
+
         <div>
           <div className="relative">
             <input

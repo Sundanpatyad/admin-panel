@@ -17,129 +17,162 @@ const LeaveTable = ({
 }) => {
   const dropdownRef = useRef(null);
 
+  const handleDocumentDownload = (documentUrl, fileName = "document") => {
+    if (!documentUrl) return;
+
+    // Create an anchor element
+    const anchor = document.createElement("a");
+    anchor.href = documentUrl;
+    anchor.download = fileName || "document";
+    document.body.appendChild(anchor);
+    anchor.click();
+    document.body.removeChild(anchor);
+  };
+
   return (
     <div className="bg-white rounded-3xl min-h-[50vh] overflow-hidden shadow-sm">
       <div className="bg-purple-700 text-white p-4">
         <h2 className="text-xl font-semibold">Applied Leaves</h2>
       </div>
-      <div className="overflow-y-auto h-[70vh]">
-        {/* Header */}
-        <div className="grid grid-cols-6 bg-purple-700 text-white sticky top-0 z-10">
-          <div className="px-6 py-4 text-sm font-medium">Profile</div>
-          <div className="px-6 py-4 text-sm font-medium">Name</div>
-          <div className="px-6 py-4 text-sm font-medium">Date</div>
-          <div className="px-6 py-4 text-sm font-medium">Reason</div>
-          <div className="px-6 py-4 text-sm font-medium">Status</div>
-          <div className="px-6 py-4 text-sm font-medium">Docs</div>
-        </div>
+      <div className="overflow-x-auto">
+        <div className="min-w-[800px] lg:w-full">
+          {/* Header */}
+          <div className="grid grid-cols-6 bg-purple-700 text-white sticky top-0 z-10">
+            <div className="px-4 md:px-6 py-4 text-sm font-medium">Profile</div>
+            <div className="px-4 md:px-6 py-4 text-sm font-medium">Name</div>
+            <div className="px-4 md:px-6 py-4 text-sm font-medium">Date</div>
+            <div className="px-4 md:px-6 py-4 text-sm font-medium">Reason</div>
+            <div className="px-4 md:px-6 py-4 text-sm font-medium">Status</div>
+            <div className="px-4 md:px-6 py-4 text-sm font-medium">Docs</div>
+          </div>
 
-        {/* Body */}
-        <div className="divide-y min-h-[50vh] overflow-y-scroll  divide-gray-100">
-          {filteredLeaves.map((leave) => (
-            <div
-              key={leave._id}
-              className="grid grid-cols-6 hover:bg-gray-50 transition-colors duration-200"
-            >
-              <div className="px-6 py-4">
-                <div className="w-12 h-12 rounded-full bg-gray-200 overflow-hidden">
-                  <img
-                    src={
-                      leave.profile ||
-                      `https://ui-avatars.com/api/?name=${leave.name}&background=random`
-                    }
-                    alt={leave.name}
-                    className="w-full h-full object-cover"
-                  />
+          {/* Body */}
+          <div className="divide-y divide-gray-100">
+            {filteredLeaves.map((leave) => (
+              <div
+                key={leave._id}
+                className="grid grid-cols-6 hover:bg-gray-50 transition-colors duration-200 items-center"
+              >
+                {/* Profile */}
+                <div className="px-4 md:px-6 py-4">
+                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gray-200 overflow-hidden">
+                    <img
+                      src={
+                        leave.profile ||
+                        `https://ui-avatars.com/api/?name=${leave.name}&background=random`
+                      }
+                      alt={leave.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
                 </div>
-              </div>
 
-              <div className="px-6 py-4">
-                <div className="text-base font-medium text-gray-900">
-                  {leave.name}
+                {/* Name */}
+                <div className="px-4 md:px-6 py-4">
+                  <div className="text-sm md:text-base font-medium text-gray-900">
+                    {leave.name}
+                  </div>
+                  <div className="text-xs md:text-sm text-gray-500">
+                    {leave.designation}
+                  </div>
                 </div>
-                <div className="text-sm text-gray-500">{leave.designation}</div>
-              </div>
 
-              <div className="px-6 py-4 text-base text-gray-900">
-                {new Date(leave.date).toLocaleDateString()}
-              </div>
+                {/* Date */}
+                <div className="px-4 md:px-6 py-4 text-sm md:text-base text-gray-900">
+                  {new Date(leave.date).toLocaleDateString()}
+                </div>
 
-              <div className="px-6 py-4 text-base text-gray-900">
-                {leave.reason}
-              </div>
+                {/* Reason */}
+                <div className="px-4 md:px-6 py-4 text-sm md:text-base text-gray-900 truncate">
+                  {leave.reason}
+                </div>
 
-              <div className="px-6 py-4">
-                <div className="relative status-dropdown" ref={dropdownRef}>
-                  <button
-                    onClick={() => toggleLeaveStatusDropdown(leave._id)}
-                    className="inline-flex items-center px-4 py-1.5 rounded-full border transition-colors duration-200 hover:bg-gray-50"
-                    style={{
-                      borderColor:
-                        leave.status.toLowerCase() === "approved"
-                          ? "#10B981"
-                          : leave.status.toLowerCase() === "rejected"
-                          ? "#EF4444"
-                          : "#F59E0B",
-                      color:
-                        leave.status.toLowerCase() === "approved"
-                          ? "#059669"
-                          : leave.status.toLowerCase() === "rejected"
-                          ? "#DC2626"
-                          : "#D97706",
-                    }}
-                  >
-                    {leave.status}
-                    <svg
-                      className="w-4 h-4 ml-1"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+                {/* Status */}
+                <div className="px-4 md:px-6 py-4">
+                  <div className="relative status-dropdown" ref={dropdownRef}>
+                    <button
+                      onClick={() => toggleLeaveStatusDropdown(leave._id)}
+                      className="inline-flex items-center px-3 md:px-4 py-1 md:py-1.5 rounded-full border text-sm md:text-base transition-colors duration-200 hover:bg-gray-50"
+                      style={{
+                        borderColor:
+                          leave.status.toLowerCase() === "approved"
+                            ? "#10B981"
+                            : leave.status.toLowerCase() === "rejected"
+                            ? "#EF4444"
+                            : "#F59E0B",
+                        color:
+                          leave.status.toLowerCase() === "approved"
+                            ? "#059669"
+                            : leave.status.toLowerCase() === "rejected"
+                            ? "#DC2626"
+                            : "#D97706",
+                      }}
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M19 9l-7 7-7-7"
-                      />
-                    </svg>
-                  </button>
-                  {selectedLeaveId === leave._id && (
-                    <div className="absolute left-0 mt-1  px-4 py-2  bg-white rounded-lg shadow-lg z-50 min-w-[120px]">
-                      {["Approved", "Pending", "Rejected"].map((status) => (
-                        <button
-                          key={status}
-                          onClick={() => handleUpdateStatus(leave._id, status)}
-                          className="w-full px-4 py-2 text-left hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg"
-                        >
-                          {status}
-                        </button>
-                      ))}
-                    </div>
+                      {leave.status}
+                      <svg
+                        className="w-3 h-3 md:w-4 md:h-4 ml-1"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </button>
+                    {selectedLeaveId === leave._id && (
+                      <div className="absolute left-0 mt-1 bg-white rounded-lg shadow-lg z-50 min-w-[120px]">
+                        {["Approved", "Pending", "Rejected"].map((status) => (
+                          <button
+                            key={status}
+                            onClick={() =>
+                              handleUpdateStatus(leave._id, status)
+                            }
+                            className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg"
+                          >
+                            {status}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Documents */}
+                <div className="px-4 md:px-6 py-4">
+                  {leave.documents && (
+                    <button
+                      onClick={() =>
+                        handleDocumentDownload(
+                          leave.documents,
+                          `leave-document-${leave._id}`
+                        )
+                      }
+                      className="text-purple-700 hover:text-purple-800 transition-colors duration-200"
+                      title="Download Document"
+                    >
+                      <svg
+                        className="w-4 h-4 md:w-5 md:h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                        />
+                      </svg>
+                    </button>
                   )}
                 </div>
               </div>
-
-              <div className="px-6 py-4">
-                {leave.documents && (
-                  <button className="text-purple-700 hover:text-purple-800 transition-colors duration-200">
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                      />
-                    </svg>
-                  </button>
-                )}
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </div>

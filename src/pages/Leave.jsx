@@ -7,16 +7,17 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 
 import AddLeaveModal from "../components/AddLeaveModal";
+import Dropdown from "../components/Dropdown"; // Add this import
 import MainLayout from "../layouts/MainLayout";
 
-const LeaveTable = ({
-  filteredLeaves,
-  selectedLeaveId,
-  toggleLeaveStatusDropdown,
-  handleUpdateStatus,
-}) => {
-  const dropdownRef = useRef(null);
+// Status options for the dropdown
+const statusOptions = [
+  { value: "Approved", label: "Approved" },
+  { value: "Pending", label: "Pending" },
+  { value: "Rejected", label: "Rejected" },
+];
 
+const LeaveTable = ({ filteredLeaves, handleUpdateStatus }) => {
   const handleDocumentDownload = (documentUrl, fileName = "document") => {
     if (!documentUrl) return;
 
@@ -34,28 +35,33 @@ const LeaveTable = ({
       <div className="bg-purple-700 text-white p-4">
         <h2 className="text-xl font-semibold">Applied Leaves</h2>
       </div>
-      <div className="overflow-x-auto">
-        <div className="min-w-[800px] lg:w-full">
-          {/* Header */}
-          <div className="grid grid-cols-6 bg-purple-700 text-white sticky top-0 z-10">
-            <div className="px-4 md:px-6 py-4 text-sm font-medium">Profile</div>
-            <div className="px-4 md:px-6 py-4 text-sm font-medium">Name</div>
-            <div className="px-4 md:px-6 py-4 text-sm font-medium">Date</div>
-            <div className="px-4 md:px-6 py-4 text-sm font-medium">Reason</div>
-            <div className="px-4 md:px-6 py-4 text-sm font-medium">Status</div>
-            <div className="px-4 md:px-6 py-4 text-sm font-medium">Docs</div>
-          </div>
-
-          {/* Body */}
-          <div className="divide-y divide-gray-100">
+      <div className="">
+        <table className="w-full min-w-[700px]">
+          <thead>
+            <tr className="bg-purple-700 text-white">
+              <th className="px-4 py-4 text-left text-sm font-medium">
+                Profile
+              </th>
+              <th className="px-4 py-4 text-left text-sm font-medium">Name</th>
+              <th className="px-4 py-4 text-left text-sm font-medium">Date</th>
+              <th className="px-4 py-4 text-left text-sm font-medium">
+                Reason
+              </th>
+              <th className="px-4 py-4 text-left text-sm font-medium">
+                Status
+              </th>
+              <th className="px-4 py-4 text-left text-sm font-medium">Docs</th>
+            </tr>
+          </thead>
+          <tbody>
             {filteredLeaves.map((leave) => (
-              <div
+              <tr
                 key={leave._id}
-                className="grid grid-cols-6 hover:bg-gray-50 transition-colors duration-200 items-center"
+                className="hover:bg-gray-50 border-b border-gray-100"
               >
                 {/* Profile */}
-                <div className="px-4 md:px-6 py-4">
-                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gray-200 overflow-hidden">
+                <td className="px-4 py-4">
+                  <div className="w-10 h-10 rounded-full bg-gray-200 overflow-hidden">
                     <img
                       src={
                         leave.profile ||
@@ -65,84 +71,44 @@ const LeaveTable = ({
                       className="w-full h-full object-cover"
                     />
                   </div>
-                </div>
+                </td>
 
                 {/* Name */}
-                <div className="px-4 md:px-6 py-4">
-                  <div className="text-sm md:text-base font-medium text-gray-900">
+                <td className="px-4 py-4">
+                  <div className="text-sm font-medium text-gray-900">
                     {leave.name}
                   </div>
-                  <div className="text-xs md:text-sm text-gray-500">
+                  <div className="text-xs text-gray-500">
                     {leave.designation}
                   </div>
-                </div>
+                </td>
 
                 {/* Date */}
-                <div className="px-4 md:px-6 py-4 text-sm md:text-base text-gray-900">
+                <td className="px-4 py-4 text-sm text-gray-900">
                   {new Date(leave.date).toLocaleDateString()}
-                </div>
+                </td>
 
                 {/* Reason */}
-                <div className="px-4 md:px-6 py-4 text-sm md:text-base text-gray-900 truncate">
+                <td className="px-4 py-4 text-sm text-gray-900 truncate max-w-[200px]">
                   {leave.reason}
-                </div>
+                </td>
 
                 {/* Status */}
-                <div className="px-4 md:px-6 py-4">
-                  <div className="relative status-dropdown" ref={dropdownRef}>
-                    <button
-                      onClick={() => toggleLeaveStatusDropdown(leave._id)}
-                      className="inline-flex items-center px-3 md:px-4 py-1 md:py-1.5 rounded-full border text-sm md:text-base transition-colors duration-200 hover:bg-gray-50"
-                      style={{
-                        borderColor:
-                          leave.status.toLowerCase() === "approved"
-                            ? "#10B981"
-                            : leave.status.toLowerCase() === "rejected"
-                            ? "#EF4444"
-                            : "#F59E0B",
-                        color:
-                          leave.status.toLowerCase() === "approved"
-                            ? "#059669"
-                            : leave.status.toLowerCase() === "rejected"
-                            ? "#DC2626"
-                            : "#D97706",
-                      }}
-                    >
-                      {leave.status}
-                      <svg
-                        className="w-3 h-3 md:w-4 md:h-4 ml-1"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M19 9l-7 7-7-7"
-                        />
-                      </svg>
-                    </button>
-                    {selectedLeaveId === leave._id && (
-                      <div className="absolute left-0 mt-1 bg-white rounded-lg shadow-lg z-50 min-w-[120px]">
-                        {["Approved", "Pending", "Rejected"].map((status) => (
-                          <button
-                            key={status}
-                            onClick={() =>
-                              handleUpdateStatus(leave._id, status)
-                            }
-                            className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg"
-                          >
-                            {status}
-                          </button>
-                        ))}
-                      </div>
-                    )}
+                <td className="px-4 py-4">
+                  <div className="relative z-[60]">
+                    <Dropdown
+                      value={leave.status}
+                      onChange={(newStatus) =>
+                        handleUpdateStatus(leave._id, newStatus)
+                      }
+                      options={statusOptions}
+                      className="w-32"
+                    />
                   </div>
-                </div>
+                </td>
 
                 {/* Documents */}
-                <div className="px-4 md:px-6 py-4">
+                <td className="px-4 py-4">
                   {leave.documents && (
                     <button
                       onClick={() =>
@@ -155,7 +121,7 @@ const LeaveTable = ({
                       title="Download Document"
                     >
                       <svg
-                        className="w-4 h-4 md:w-5 md:h-5"
+                        className="w-5 h-5"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -169,11 +135,11 @@ const LeaveTable = ({
                       </svg>
                     </button>
                   )}
-                </div>
-              </div>
+                </td>
+              </tr>
             ))}
-          </div>
-        </div>
+          </tbody>
+        </table>
       </div>
     </div>
   );
@@ -268,7 +234,7 @@ const LeaveCalendar = ({
               <button
                 key={day}
                 onClick={() => setSelectedDate(date)}
-                className={`h-12 flex items-center justify-center rounded-lg text-sm relative transition-colors duration-200 ${
+                className={`h-12 border flex items-center justify-center rounded-lg text-sm relative transition-colors duration-200 ${
                   isSelected
                     ? "bg-purple-100 text-purple-700 font-semibold"
                     : hasLeave
@@ -279,6 +245,11 @@ const LeaveCalendar = ({
                 {day}
                 {hasLeave && (
                   <span className="absolute bottom-1 left-1/2 transform -translate-x-1/2 w-1.5 h-1.5 bg-purple-500 rounded-full"></span>
+                )}
+                {hasLeave && day === 8 && (
+                  <span className="absolute top-1 right-1 w-5 h-5 bg-purple-700 rounded-full flex items-center justify-center text-white text-xs">
+                    1
+                  </span>
                 )}
               </button>
             );
@@ -340,7 +311,6 @@ const Leave = () => {
   const [status, setStatus] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
-  const [selectedLeaveId, setSelectedLeaveId] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [isAddLeaveModalOpen, setIsAddLeaveModalOpen] = useState(false);
 
@@ -365,23 +335,13 @@ const Leave = () => {
       await dispatch(updateLeave({ leaveId, status: newStatus })).unwrap();
       dispatch(fetchAllLeaves());
       dispatch(fetchApprovedLeaves());
-      setSelectedLeaveId(null);
     } catch (error) {
       console.error("Failed to update status:", error);
     }
   };
 
-  const toggleLeaveStatusDropdown = (leaveId) => {
-    setSelectedLeaveId(selectedLeaveId === leaveId ? null : leaveId);
-  };
-
   useEffect(() => {
     const handleClickOutside = (event) => {
-      // Handle status dropdown in table
-      if (selectedLeaveId && !event.target.closest(".status-dropdown")) {
-        setSelectedLeaveId(null);
-      }
-
       // Handle filter dropdown
       if (isStatusDropdownOpen && !event.target.closest(".filter-dropdown")) {
         setIsStatusDropdownOpen(false);
@@ -390,7 +350,7 @@ const Leave = () => {
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [selectedLeaveId, isStatusDropdownOpen]);
+  }, [isStatusDropdownOpen]);
 
   const filteredLeaves = leaves.filter((leave) => {
     const matchesStatus =
@@ -460,44 +420,18 @@ const Leave = () => {
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center space-x-4">
             <div className="relative filter-dropdown" ref={filterDropdownRef}>
-              <button
-                onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
-                className="px-4 py-2 border border-gray-300 rounded-full flex items-center space-x-2 hover:bg-gray-50 transition-colors duration-200 shadow-sm"
-              >
-                <span className="text-gray-700">
-                  {status === "all"
-                    ? "All Status"
-                    : status.charAt(0).toUpperCase() + status.slice(1)}
-                </span>
-                <svg
-                  className="w-4 h-4 text-gray-500"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </button>
-              {isStatusDropdownOpen && (
-                <div className="absolute z-50 mt-2 bg-white  rounded-lg shadow-lg w-full overflow-hidden">
-                  {["all", "approved", "pending", "rejected"].map((value) => (
-                    <button
-                      key={value}
-                      onClick={() => handleStatusChange(value)}
-                      className={`w-full px-4 py-2 text-left hover:bg-gray-50 capitalize transition-colors duration-200 ${
-                        status === value ? "bg-purple-50 text-purple-700" : ""
-                      }`}
-                    >
-                      {value === "all" ? "All Status" : value}
-                    </button>
-                  ))}
-                </div>
-              )}
+              <Dropdown
+                value={status}
+                onChange={handleStatusChange}
+                options={[
+                  { value: "all", label: "Status" },
+                  { value: "approved", label: "Approved" },
+                  { value: "pending", label: "Pending" },
+                  { value: "rejected", label: "Rejected" },
+                ]}
+                placeholder="Status"
+                className="w-32"
+              />
             </div>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -517,7 +451,7 @@ const Leave = () => {
               </div>
               <input
                 type="search"
-                placeholder="Search name or reason"
+                placeholder="Search"
                 value={searchQuery}
                 onChange={handleSearch}
                 className="pl-10 px-4 py-2 border border-gray-300 rounded-full w-64 focus:outline-none focus:ring-2 focus:ring-purple-500 shadow-sm"
@@ -547,24 +481,26 @@ const Leave = () => {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 min-h-[70vh] lg:grid-cols-2 gap-6">
-          <LeaveTable
-            filteredLeaves={filteredLeaves}
-            selectedLeaveId={selectedLeaveId}
-            toggleLeaveStatusDropdown={toggleLeaveStatusDropdown}
-            handleUpdateStatus={handleUpdateStatus}
-          />
+        <div className="grid grid-cols-1 min-h-[70vh] lg:grid-cols-3 gap-4">
+          <div className="lg:col-span-2">
+            <LeaveTable
+              filteredLeaves={filteredLeaves}
+              handleUpdateStatus={handleUpdateStatus}
+            />
+          </div>
 
-          <LeaveCalendar
-            selectedDate={selectedDate}
-            handlePrevMonth={handlePrevMonth}
-            handleNextMonth={handleNextMonth}
-            monthNames={monthNames}
-            emptyDays={emptyDays}
-            days={days}
-            setSelectedDate={setSelectedDate}
-            approvedLeaves={approvedLeaves}
-          />
+          <div className="lg:col-span-1">
+            <LeaveCalendar
+              selectedDate={selectedDate}
+              handlePrevMonth={handlePrevMonth}
+              handleNextMonth={handleNextMonth}
+              monthNames={monthNames}
+              emptyDays={emptyDays}
+              days={days}
+              setSelectedDate={setSelectedDate}
+              approvedLeaves={approvedLeaves}
+            />
+          </div>
         </div>
 
         <AddLeaveModal

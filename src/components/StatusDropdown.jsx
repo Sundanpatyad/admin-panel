@@ -37,7 +37,7 @@ const StatusDropdown = ({ value, onChange, className }) => {
   };
 
   return (
-    <div className="relative" ref={dropdownRef}>
+    <div ref={dropdownRef}>
       <button
         type="button"
         className={`w-[132px] h-[38px] px-4 py-2 text-sm rounded-full flex items-center justify-between ${getStatusStyles(
@@ -64,7 +64,7 @@ const StatusDropdown = ({ value, onChange, className }) => {
       </button>
 
       {isOpen && (
-        <div className="absolute z-50 w-full mt-1 bg-white rounded-md shadow-lg border border-gray-200">
+        <div className="absolute z-[999] max-w-md mt-1 bg-white rounded-md shadow-lg border border-gray-200">
           <div className="py-1">
             {statusOptions.map((option) => (
               <button

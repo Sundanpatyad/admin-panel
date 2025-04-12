@@ -77,11 +77,27 @@ function Dashboard() {
     return matchesSearch && matchesStatus && matchesPosition;
   });
 
+  const handleDownloadResume = (resumeUrl, originalName) => {
+    if (!resumeUrl) {
+      alert("No resume available for this candidate");
+      return;
+    }
+
+    // Create a temporary link to download the file
+    const link = document.createElement("a");
+    link.href = resumeUrl;
+    link.target = "_blank";
+    link.download = originalName || "resume.pdf";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   const renderContent = () => {
     if (status === "loading" && candidates.length === 0) {
       return (
-        <div className="p-4 sm:p-6 flex justify-center items-center h-64">
-          <div className="text-lg sm:text-xl text-gray-600">
+        <div className="p-4 flex justify-center items-center h-64">
+          <div className="text-base sm:text-lg text-gray-600">
             Loading candidates...
           </div>
         </div>
@@ -90,17 +106,20 @@ function Dashboard() {
 
     if (status === "failed" && candidates.length === 0) {
       return (
-        <div className="p-4 sm:p-6 flex justify-center items-center h-64">
-          <div className="text-lg sm:text-xl text-red-600">Error: {error}</div>
+        <div className="p-4 flex justify-center items-center h-64">
+          <div className="text-base sm:text-lg text-red-600">
+            Error: {error}
+          </div>
         </div>
       );
     }
 
     return (
-      <div className="bg-white h-[70vh] rounded-xl sm:rounded-3xl overflow-hidden shadow">
-        <div className="overflow-x-auto">
+      <div className="bg-white h-auto sm:h-[70vh] rounded-lg overflow-hidden sm:rounded-3xl shadow">
+        <div>
+          {/* Desktop View */}
           <table className="w-full min-w-[800px]">
-            <thead className="bg-purple-700 text-white">
+            <thead className="bg-purple-700  text-white">
               <tr>
                 <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs sm:text-sm font-medium whitespace-nowrap">
                   Sr no.
@@ -157,7 +176,7 @@ function Dashboard() {
                   <td className="px-3 sm:px-6 py-2 sm:py-4 text-xs sm:text-sm whitespace-nowrap">
                     {candidate?.experience || "-"}
                   </td>
-                  <td className="px-3 sm:px-6 py-2 sm:py-4 text-xs sm:text-sm relative">
+                  <td className=" relative px-3 sm:px-6 py-2 sm:py-4 text-xs sm:text-sm relative">
                     <button
                       className="text-gray-600 hover:text-gray-900"
                       onClick={() =>
@@ -177,9 +196,17 @@ function Dashboard() {
                       </svg>
                     </button>
                     {selectedAction === candidate._id && (
-                      <div className="absolute right-0 mt-2 w-36 sm:w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200">
+                      <div className="absolute z-[999] right-0 mt-2 w-36 sm:w-48 bg-white rounded-md shadow-lg z-10 border border-gray-200">
                         <div className="py-1">
-                          <button className="block w-full text-left px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100">
+                          <button
+                            className="block w-full text-left px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-100"
+                            onClick={() =>
+                              handleDownloadResume(
+                                candidate.resume?.url,
+                                candidate.resume?.originalName
+                              )
+                            }
+                          >
                             Download Resume
                           </button>
                           <button
